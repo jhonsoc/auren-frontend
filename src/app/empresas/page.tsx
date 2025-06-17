@@ -1,105 +1,72 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useAuthGuard } from '@/hooks/useAuthGuard';
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
 
-export default function RegistrarEmpresaPage() {
+interface Empresa {
+  id: number;
+  nombre: string;
+  nit: string;
+  email: string;
+  telefono: string;
+}
+
+export default function ListarEmpresasPage() {
+  useAuthGuard();
+  const [empresas, setEmpresas] = useState<Empresa[]>([]);
   const router = useRouter();
-  const [form, setForm] = useState({
-    nombre: '',
-    nit: '',
-    email: '',
-    telefono: '',
-  });
-  const [error, setError] = useState('');
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
+  useEffect(() => {
+    const fetchEmpresas = async () => {
+      const token = localStorage.getItem('token');
+      if (!token) return;
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
-    const token = localStorage.getItem('token');
+      try {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/empresas`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
 
-    try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/empresas`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(form),
-      });
+        if (!res.ok) throw new Error();
 
-      if (!res.ok) throw new Error('Error al crear la empresa');
+        const data = await res.json();
+        setEmpresas(data);
+      } catch {
+        toast.error('Error al cargar empresas.');
+      }
+    };
 
-      toast.success('Empresa registrada exitosamente');
-      setTimeout(() => {
-        router.push('/empresas');
-      }, 1500);
-    } catch (err) {
-      toast.error('Error al crear empresa. Revisa los datos.');
-    }
-  };
+    fetchEmpresas();
+  }, []);
 
   return (
-    <div className="bg-white rounded shadow p-6 max-w-xl mx-auto">
-      <h2 className="text-2xl font-semibold text-blue-800 mb-4">Registrar Empresa</h2>
+    <div className="p-4">
+      <h2 className="text-2xl font-semibold text-blue-800 mb-4">Empresas Registradas</h2>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
-        {/* ... campos igual que antes ... */}
-        <div>
-          <label className="block text-sm text-gray-700 mb-1">Nombre</label>
-          <input
-            name="nombre"
-            required
-            value={form.nombre}
-            onChange={handleChange}
-            className="w-full border px-3 py-2 rounded focus:outline-none focus:ring-1 focus:ring-blue-600"
-          />
-        </div>
-        <div>
-          <label className="block text-sm text-gray-700 mb-1">NIT</label>
-          <input
-            name="nit"
-            required
-            value={form.nit}
-            onChange={handleChange}
-            className="w-full border px-3 py-2 rounded focus:outline-none focus:ring-1 focus:ring-blue-600"
-          />
-        </div>
-        <div>
-          <label className="block text-sm text-gray-700 mb-1">Email</label>
-          <input
-            name="email"
-            type="email"
-            required
-            value={form.email}
-            onChange={handleChange}
-            className="w-full border px-3 py-2 rounded focus:outline-none focus:ring-1 focus:ring-blue-600"
-          />
-        </div>
-        <div>
-          <label className="block text-sm text-gray-700 mb-1">Teléfono</label>
-          <input
-            name="telefono"
-            required
-            value={form.telefono}
-            onChange={handleChange}
-            className="w-full border px-3 py-2 rounded focus:outline-none focus:ring-1 focus:ring-blue-600"
-          />
-        </div>
-        <div className="text-right">
-          <button
-            type="submit"
-            className="bg-blue-700 text-white px-4 py-2 rounded hover:bg-blue-800 transition"
-          >
-            Guardar
-          </button>
-        </div>
-      </form>
+      <table className="w-full border border-gray-300 rounded text-sm">
+        <thead className="bg-gray-100">
+          <tr>
+            <th className="p-2">Nombre</th>
+            <th className="p-2">NIT</th>
+            <th className="p-2">Email</th>
+            <th className="p-2">Teléfono</th>
+          </tr>
+        </thead>
+        <tbody>
+          {empresas.map((empresa) => (
+            <tr key={empresa.id} className="border-t hover:bg-gray-50">
+              <td className="p-2">{empresa.nombre}</td>
+              <td className="p-2">{empresa.nit}</td>
+              <td className="p-2">{empresa.email}</td>
+              <td className="p-2">{empresa.telefono}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 }

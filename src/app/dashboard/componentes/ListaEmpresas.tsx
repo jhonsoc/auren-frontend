@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import EditarEmpresaModal from './EditarEmpresaModal';
+import { Pencil, Trash2 } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 interface Empresa {
   id: string;
@@ -14,17 +16,32 @@ interface Empresa {
 export default function ListaEmpresas() {
   const [empresas, setEmpresas] = useState<Empresa[]>([]);
   const [empresaEditando, setEmpresaEditando] = useState<Empresa | null>(null);
+  const [filtroNIT, setFiltroNIT] = useState('');
+  const [filtroNombre, setFiltroNombre] = useState('');
 
-  const cargarEmpresas = () => {
+  const cargarEmpresas = async () => {
     const token = localStorage.getItem('token');
-    fetch(`${process.env.NEXT_PUBLIC_API_URL}/empresas`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    })
-      .then((res) => res.json())
-      .then(setEmpresas)
-      .catch(() => {});
+    if (!token) return;
+
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/empresas`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const data = await res.json();
+
+      if (!res.ok || !Array.isArray(data)) {
+        throw new Error('Respuesta inválida del servidor');
+      }
+
+      setEmpresas(data);
+    } catch (error) {
+      toast.error('Error al cargar empresas');
+      setEmpresas([]); // fallback seguro
+      console.error(error);
+    }
   };
 
   useEffect(() => {
@@ -44,61 +61,67 @@ export default function ListaEmpresas() {
     cargarEmpresas();
   };
 
+  const empresasFiltradas = empresas.filter((empresa) => {
+    const nitMatch = empresa.nit.toLowerCase().includes(filtroNIT.toLowerCase());
+    const nombreMatch = empresa.razonSocial.toLowerCase().includes(filtroNombre.toLowerCase());
+    return nitMatch && nombreMatch;
+  });
+
   return (
-    <div className="p-6 overflow-x-auto">
-      <h2 className="text-2xl font-bold mb-4 text-blue-800">Empresas Registradas</h2>
-      <table className="min-w-full text-sm bg-white border rounded shadow">
-        <thead className="bg-blue-100 text-blue-800 text-left">
-          <tr>
-            <th className="px-4 py-2">NIT</th>
-            <th className="px-4 py-2">Razón Social</th>
-            <th className="px-4 py-2">Dirección</th>
-            <th className="px-4 py-2">Teléfono</th>
-            <th className="px-4 py-2">Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
-          {empresas.length > 0 ? (
-            empresas.map((e) => (
-              <tr key={e.id} className="group border-t hover:bg-gray-50">
-                <td className="px-4 py-2">{e.nit}</td>
-                <td className="px-4 py-2">{e.razonSocial}</td>
-                <td className="px-4 py-2">{e.direccion}</td>
-                <td className="px-4 py-2">{e.telefono}</td>
-                <td className="px-4 py-2">
-                  <div className="invisible group-hover:visible flex gap-2">
-                    <button
-                      onClick={() => setEmpresaEditando(e)}
-                      className="text-blue-600 hover:underline"
-                    >
-                      Editar
-                    </button>
-                    <button
-                      onClick={() => eliminarEmpresa(e.id)}
-                      className="text-red-600 hover:underline"
-                    >
-                      Eliminar
-                    </button>
-                  </div>
+    <div className="space-y-4">
+      <h2 className="text-xl font-semibold text-gray-800">Lista de Empresas</h2>
+
+      <div className="flex gap-4">
+        <input
+          type="text"
+          placeholder="Filtrar por NIT"
+          value={filtroNIT}
+          onChange={(e) => setFiltroNIT(e.target.value)}
+          className="border border-gray-300 px-3 py-2 rounded w-1/3"
+        />
+        <input
+          type="text"
+          placeholder="Filtrar por razón social"
+          value={filtroNombre}
+          onChange={(e) => setFiltroNombre(e.target.value)}
+          className="border border-gray-300 px-3 py-2 rounded w-1/3"
+        />
+      </div>
+
+      <div className="overflow-x-auto">
+        <table className="min-w-full table-auto border border-gray-300 bg-white">
+          <thead>
+            <tr className="bg-gray-100">
+              <th className="border px-4 py-2 text-left">NIT</th>
+              <th className="border px-4 py-2 text-left">Razón Social</th>
+              <th className="border px-4 py-2 text-left">Dirección</th>
+              <th className="border px-4 py-2 text-left">Teléfono</th>
+              <th className="border px-4 py-2 text-left">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            {empresasFiltradas.map((empresa) => (
+              <tr key={empresa.id} className="hover:bg-gray-50 group">
+                <td className="border px-4 py-2">{empresa.nit}</td>
+                <td className="border px-4 py-2">{empresa.razonSocial}</td>
+                <td className="border px-4 py-2">{empresa.direccion}</td>
+                <td className="border px-4 py-2">{empresa.telefono}</td>
+                <td className="border px-4 py-2 space-x-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <button onClick={() => setEmpresaEditando(empresa)} className="text-blue-600 hover:underline">
+                    <Pencil size={16} />
+                  </button>
+                  <button onClick={() => eliminarEmpresa(empresa.id)} className="text-red-600 hover:underline">
+                    <Trash2 size={16} />
+                  </button>
                 </td>
               </tr>
-            ))
-          ) : (
-            <tr>
-              <td colSpan={5} className="text-center py-4 text-gray-500">
-                No hay empresas registradas.
-              </td>
-            </tr>
-          )}
-        </tbody>
-      </table>
+            ))}
+          </tbody>
+        </table>
+      </div>
 
       {empresaEditando && (
-        <EditarEmpresaModal
-          empresa={empresaEditando}
-          onClose={() => setEmpresaEditando(null)}
-          onUpdate={cargarEmpresas}
-        />
+        <EditarEmpresaModal empresa={empresaEditando} onClose={() => setEmpresaEditando(null)} recargar={cargarEmpresas} />
       )}
     </div>
   );

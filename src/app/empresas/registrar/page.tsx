@@ -3,8 +3,10 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
+import { useAuthGuard } from '@/hooks/useAuthGuard';
 
 export default function RegistrarEmpresaPage() {
+  useAuthGuard();
   const router = useRouter();
 
   const [form, setForm] = useState({
