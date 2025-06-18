@@ -91,13 +91,15 @@ export default function RegistrarUsuario() {
       <h2 className="text-2xl font-semibold mb-4 text-black">Registrar Usuario</h2>
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {[
-            ['documento', 'Documento'],
-            ['nombres', 'Nombres'],
-            ['apellidos', 'Apellidos'],
-            ['telefono', 'Teléfono'],
-            ['email', 'Correo'],
-          ].map(([name, label]) => (
+          {(
+            [
+              ['documento', 'Documento'],
+              ['nombres', 'Nombres'],
+              ['apellidos', 'Apellidos'],
+              ['telefono', 'Teléfono'],
+              ['email', 'Correo'],
+            ] as [keyof Usuario, string][]
+          ).map(([name, label]) => (
             <div key={name}>
               <Label htmlFor={name} className="text-black">
                 {label}

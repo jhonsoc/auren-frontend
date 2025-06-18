@@ -92,7 +92,11 @@ export default function ConsultarUsuarios() {
                   <Button variant="outline" size="sm" onClick={() => setUsuarioEditando(u)}>
                     <Pencil className="w-4 h-4" />
                   </Button>
-                  <Button variant="destructive" size="sm" onClick={() => eliminarUsuario(u.id)}>
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    onClick={() => u.id && eliminarUsuario(u.id)}
+                  >
                     <Trash2 className="w-4 h-4" />
                   </Button>
                 </td>

@@ -31,14 +31,16 @@ export function UsuarioEmpresaForm({ formData, onChange, empresas, onEmpresaSele
         </Select>
       </div>
 
-      {[
-        ['documento', 'Documento'],
-        ['nombres', 'Nombres'],
-        ['apellidos', 'Apellidos'],
-        ['telefono', 'Teléfono'],
-        ['email', 'Email'],
-        ['rol', 'Rol (admin o empleado)'],
-      ].map(([name, label]) => (
+      {(
+        [
+          ['documento', 'Documento'],
+          ['nombres', 'Nombres'],
+          ['apellidos', 'Apellidos'],
+          ['telefono', 'Teléfono'],
+          ['email', 'Email'],
+          ['rol', 'Rol (admin o empleado)'],
+        ] as [keyof Usuario, string][]
+      ).map(([name, label]) => (
         <div key={name}>
           <Label htmlFor={name} className="text-black">{label}</Label>
           <Input

@@ -36,7 +36,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         }
 
         try {
-            const decoded = jwtDecode(token);
+            const decoded = jwtDecode<DecodedToken>(token);
             setUsuario(decoded);
         } catch {
             toast.error('Token inválido. Redirigiendo...');

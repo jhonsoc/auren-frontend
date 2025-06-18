@@ -20,6 +20,17 @@ export default function ConsultarUsuariosEmpresa() {
     fetchEmpresas();
   }, []);
 
+  const fetchUsuarios = useCallback(async () => {
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/usuario-empresa/empresa/${empresaSeleccionada}`, {
+        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+      });
+      const data = await res.json();
+      setUsuarios(data);
+    } catch {
+      toast.error('Error al cargar usuarios');
+    }
+  }, [empresaSeleccionada]);
   useEffect(() => {
     if (empresaSeleccionada) fetchUsuarios();
   }, [empresaSeleccionada, fetchUsuarios]);
@@ -36,17 +47,6 @@ export default function ConsultarUsuariosEmpresa() {
     }
   };
 
-  const fetchUsuarios = useCallback(async () => {
-    try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/usuario-empresa/empresa/${empresaSeleccionada}`, {
-        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
-      });
-      const data = await res.json();
-      setUsuarios(data);
-    } catch {
-      toast.error('Error al cargar usuarios');
-    }
-  }, [empresaSeleccionada]);
 
   const eliminarUsuario = async (id: string) => {
     if (!confirm('¿Eliminar este usuario?')) return;
@@ -119,7 +119,11 @@ export default function ConsultarUsuariosEmpresa() {
                   <Button variant="outline" size="sm" onClick={() => setUsuarioEditando(u)}>
                     <Pencil className="w-4 h-4" />
                   </Button>
-                  <Button variant="destructive" size="sm" onClick={() => eliminarUsuario(u.id)}>
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    onClick={() => u.id && eliminarUsuario(u.id)}
+                  >
                     <Trash2 className="w-4 h-4" />
                   </Button>
                 </td>

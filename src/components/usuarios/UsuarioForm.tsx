@@ -13,14 +13,16 @@ interface Props {
 export default function UsuarioForm({ formData, onChange }: Props) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-      {[
-        ['documento', 'Documento'],
-        ['nombres', 'Nombres'],
-        ['apellidos', 'Apellidos'],
-        ['telefono', 'Teléfono'],
-        ['email', 'Correo'],
-        ['rol', 'Rol'],
-      ].map(([name, label]) => (
+      {(
+        [
+          ['documento', 'Documento'],
+          ['nombres', 'Nombres'],
+          ['apellidos', 'Apellidos'],
+          ['telefono', 'Teléfono'],
+          ['email', 'Correo'],
+          ['rol', 'Rol'],
+        ] as [keyof Usuario, string][]
+      ).map(([name, label]) => (
         <div key={name}>
           <Label htmlFor={name} className="text-black">
             {label}

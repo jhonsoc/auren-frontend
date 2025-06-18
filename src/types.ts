@@ -11,6 +11,9 @@ export interface Usuario {
 
 export interface Empresa {
   id: string;
+  nit: string;
   razonSocial: string;
+  direccion: string;
+  telefono: string;
 }
 
