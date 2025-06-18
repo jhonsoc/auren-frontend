@@ -1,10 +1,11 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { toast } from 'sonner';
-import { Pencil, Trash2 } from 'lucide-react';
+import type { Usuario } from '@/types';
+  const [usuarios, setUsuarios] = useState<Usuario[]>([]);
+  const [usuarioEditando, setUsuarioEditando] = useState<Usuario | null>(null);
+        ? (data as Usuario[])
+        : Array.isArray((data as { usuarios?: unknown }).usuarios)
+        ? ((data as { usuarios: Usuario[] }).usuarios)
 import ModalEditarUsuario from '@/components/usuarios/ModalEditarUsuario';
 
 interface Usuario {

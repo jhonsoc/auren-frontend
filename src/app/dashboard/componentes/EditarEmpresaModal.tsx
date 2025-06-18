@@ -1,9 +1,10 @@
 'use client';
 
 import { useState } from 'react';
+import type { Empresa } from '@/types';
 
 interface Props {
-  empresa: any;
+  empresa: Empresa;
   onClose: () => void;
   onUpdate: () => void;
 }

@@ -6,11 +6,12 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from '@/components/ui/select';
 import { jwtDecode } from 'jwt-decode';
+import type { Usuario, Empresa } from '@/types';
 import { toast } from 'sonner';
 
-interface Empresa {
-  id: string;
-  razonSocial: string;
+  const [formData, setFormData] = useState<Usuario>({
+  const [empresas, setEmpresas] = useState<Empresa[]>([]);
+        const decoded = jwtDecode<{ rol?: string }>(token);
 }
 
 interface FormData {

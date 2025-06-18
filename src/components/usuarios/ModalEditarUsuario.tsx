@@ -1,13 +1,14 @@
 'use client';
 
 import { useState } from 'react';
+import type { Usuario } from '@/types';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import UsuarioForm from './UsuarioForm';
 import { toast } from 'sonner';
 
 interface Props {
-  usuario: any;
+  usuario: Usuario;
   onClose: () => void;
   onActualizado: () => void;
 }

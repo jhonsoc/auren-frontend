@@ -8,7 +8,13 @@ import toast from 'react-hot-toast';
 import RegistrarEmpresa from './componentes/RegistrarEmpresa';
 import ListaEmpresas from './componentes/ListaEmpresas';
 
-interface Usuario {
+interface DecodedToken {
+    nombre?: string;
+    empresaNombre?: string;
+    rol?: string;
+}
+
+    const [usuario, setUsuario] = useState<DecodedToken | null>(null);
   id: string;
   documento: string;
   nombre: string;

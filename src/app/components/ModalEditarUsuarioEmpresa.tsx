@@ -5,12 +5,13 @@ import { UsuarioEmpresaForm } from './UsuarioEmpresaForm';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
+import type { Usuario, Empresa } from '@/types';
 
 interface Props {
-  usuario: any;
+  usuario: Usuario;
   onClose: () => void;
   onActualizado: () => void;
-  empresas: { id: string; razonSocial: string }[];
+  empresas: Empresa[];
 }
 
 export default function ModalEditarUsuarioEmpresa({ usuario, onClose, onActualizado, empresas }: Props) {
@@ -55,7 +56,6 @@ export default function ModalEditarUsuarioEmpresa({ usuario, onClose, onActualiz
           onChange={handleChange}
           empresas={empresas}
           onEmpresaSelect={handleEmpresaSelect}
-          isEdit
         />
         <div className="flex justify-end gap-2 mt-4">
           <Button variant="outline" onClick={onClose}>Cancelar</Button>

@@ -3,8 +3,10 @@
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
+import type { Usuario } from '@/types';
+
 interface Props {
-  formData: any;
+  formData: Usuario;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 

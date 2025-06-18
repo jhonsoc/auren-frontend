@@ -7,13 +7,14 @@ import { toast } from 'sonner';
 import { Pencil, Trash2 } from 'lucide-react';
 import ModalEditarUsuarioEmpresa from '../../components/ModalEditarUsuarioEmpresa';
 import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from '@/components/ui/select';
+import type { Usuario, Empresa } from '@/types';
 
 export default function ConsultarUsuariosEmpresa() {
-  const [usuarios, setUsuarios] = useState<any[]>([]);
-  const [empresas, setEmpresas] = useState<any[]>([]);
+  const [usuarios, setUsuarios] = useState<Usuario[]>([]);
+  const [empresas, setEmpresas] = useState<Empresa[]>([]);
   const [empresaSeleccionada, setEmpresaSeleccionada] = useState<string>('');
   const [filtro, setFiltro] = useState('');
-  const [usuarioEditando, setUsuarioEditando] = useState<any | null>(null);
+  const [usuarioEditando, setUsuarioEditando] = useState<Usuario | null>(null);
 
   useEffect(() => {
     fetchEmpresas();
@@ -78,7 +79,7 @@ export default function ConsultarUsuariosEmpresa() {
             <SelectValue placeholder="Seleccionar empresa" />
           </SelectTrigger>
           <SelectContent>
-            {empresas.map((e: any) => (
+            {empresas.map((e) => (
               <SelectItem key={e.id} value={e.id}>
                 {e.razonSocial}
               </SelectItem>
