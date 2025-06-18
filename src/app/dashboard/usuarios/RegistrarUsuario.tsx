@@ -8,8 +8,23 @@ import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from '@
 import { jwtDecode } from 'jwt-decode';
 import { toast } from 'sonner';
 
+interface Empresa {
+  id: string;
+  razonSocial: string;
+}
+
+interface FormData {
+  documento: string;
+  nombres: string;
+  apellidos: string;
+  telefono: string;
+  email: string;
+  rol: string;
+  empresaId: string;
+}
+
 export default function RegistrarUsuario() {
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<FormData>({
     documento: '',
     nombres: '',
     apellidos: '',
@@ -18,8 +33,9 @@ export default function RegistrarUsuario() {
     rol: '',
     empresaId: '',
   });
+
   const [loading, setLoading] = useState(false);
-  const [empresas, setEmpresas] = useState<{ id: string; razonSocial: string }[]>([]);
+  const [empresas, setEmpresas] = useState<Empresa[]>([]);
   const [isSuperAdmin, setIsSuperAdmin] = useState(false);
 
   useEffect(() => {
@@ -54,7 +70,11 @@ export default function RegistrarUsuario() {
   };
 
   const handleRolSelect = (rol: string) => {
-    setFormData((prev) => ({ ...prev, rol, empresaId: rol === 'admin' || rol === 'empleado' ? prev.empresaId : '' }));
+    setFormData((prev) => ({
+      ...prev,
+      rol,
+      empresaId: rol === 'admin' || rol === 'empleado' ? prev.empresaId : '',
+    }));
   };
 
   const handleEmpresaSelect = (empresaId: string) => {
@@ -90,22 +110,16 @@ export default function RegistrarUsuario() {
       <h2 className="text-2xl font-semibold mb-4 text-black">Registrar Usuario</h2>
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {[
-            ['documento', 'Documento'],
-            ['nombres', 'Nombres'],
-            ['apellidos', 'Apellidos'],
-            ['telefono', 'Teléfono'],
-            ['email', 'Correo'],
-          ].map(([name, label]) => (
+          {['documento', 'nombres', 'apellidos', 'telefono', 'email'].map((name) => (
             <div key={name}>
               <Label htmlFor={name} className="text-black">
-                {label}
+                {name.charAt(0).toUpperCase() + name.slice(1)}
               </Label>
               <Input
                 name={name}
-                value={formData[name]}
+                value={formData[name as keyof FormData]}
                 onChange={handleChange}
-                placeholder={label}
+                placeholder={name.charAt(0).toUpperCase() + name.slice(1)}
                 className="text-black placeholder-gray-400"
               />
             </div>
@@ -147,6 +161,7 @@ export default function RegistrarUsuario() {
             </div>
           )}
         </div>
+
         <div className="text-right">
           <Button type="submit" disabled={loading} className="bg-blue-700 hover:bg-blue-800 text-white rounded-xl">
             {loading ? 'Registrando...' : 'Registrar'}

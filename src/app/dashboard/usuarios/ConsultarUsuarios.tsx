@@ -1,22 +1,28 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { Pencil, Trash2 } from 'lucide-react';
 import ModalEditarUsuario from '@/components/usuarios/ModalEditarUsuario';
 
+interface Usuario {
+  id: string;
+  documento: string;
+  nombres: string;
+  apellidos: string;
+  telefono: string;
+  email: string;
+  rol: string;
+}
+
 export default function ConsultarUsuarios() {
-  const [usuarios, setUsuarios] = useState<any[]>([]);
+  const [usuarios, setUsuarios] = useState<Usuario[]>([]);
   const [filtro, setFiltro] = useState('');
-  const [usuarioEditando, setUsuarioEditando] = useState<any | null>(null);
+  const [usuarioEditando, setUsuarioEditando] = useState<Usuario | null>(null);
 
-  useEffect(() => {
-    fetchUsuarios();
-  }, []);
-
-  const fetchUsuarios = async () => {
+  const fetchUsuarios = useCallback(async () => {
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/usuarios`, {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
@@ -31,7 +37,11 @@ export default function ConsultarUsuarios() {
     } catch {
       toast.error('Error al cargar usuarios');
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    fetchUsuarios();
+  }, [fetchUsuarios]);
 
   const eliminarUsuario = async (id: string) => {
     if (!confirm('¿Eliminar este usuario?')) return;
