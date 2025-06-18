@@ -121,7 +121,11 @@ export default function ListaEmpresas() {
       </div>
 
       {empresaEditando && (
-        <EditarEmpresaModal empresa={empresaEditando} onClose={() => setEmpresaEditando(null)} recargar={cargarEmpresas} />
+        <EditarEmpresaModal
+          empresa={empresaEditando}
+          onClose={() => setEmpresaEditando(null)}
+          onUpdate={cargarEmpresas}
+        />
       )}
     </div>
   );

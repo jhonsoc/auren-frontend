@@ -63,7 +63,7 @@ export default function RegistrarUsuarioEmpresa() {
       }
 
       toast.success('Usuario registrado exitosamente');
-    } catch (err) {
+    } catch {
       toast.error('Error al registrar usuario');
     } finally {
       setLoading(false);

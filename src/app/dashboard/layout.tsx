@@ -8,16 +8,16 @@ import toast from 'react-hot-toast';
 import RegistrarEmpresa from './componentes/RegistrarEmpresa';
 import ListaEmpresas from './componentes/ListaEmpresas';
 
-interface Usuario {
-  id: string;
-  documento: string;
-  nombre: string;
-  rol: string;
+interface DecodedToken {
+  id?: string;
+  documento?: string;
+  nombre?: string;
+  rol?: string;
   empresaNombre?: string;
 }
 
-export default function DashboardLayout() {
-  const [usuario, setUsuario] = useState<Usuario | null>(null);
+export default function DashboardLayout({ children }: { children: React.ReactNode }) {
+  const [usuario, setUsuario] = useState<DecodedToken | null>(null);
   const [subMenuEmpresas, setSubMenuEmpresas] = useState(false);
   const [subMenuUsuarios, setSubMenuUsuarios] = useState(false);
   const [vistaActiva, setVistaActiva] = useState<'inicio' | 'registrarEmpresa' | 'listarEmpresas'>('inicio');
@@ -36,7 +36,7 @@ export default function DashboardLayout() {
     }
 
     try {
-      const decoded = jwtDecode<Usuario>(token);
+      const decoded = jwtDecode<DecodedToken>(token);
       setUsuario(decoded);
     } catch {
       toast.error('Token inválido. Redirigiendo...');
@@ -44,6 +44,16 @@ export default function DashboardLayout() {
       setTimeout(() => router.push('/login'), 100);
     }
   }, [router]);
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setOpenMenu(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   useEffect(() => {
     if (pathname.startsWith('/dashboard/usuarios') || pathname.startsWith('/dashboard/usuario-empresa')) {
@@ -69,11 +79,11 @@ export default function DashboardLayout() {
     if (!subMenuUsuarios) setSubMenuEmpresas(false);
   };
 
-  const mostrarRutasUsuarios = pathname.startsWith('/dashboard/usuarios') || pathname.startsWith('/dashboard/usuario-empresa');
+  const mostrarRutasUsuarios =
+    pathname.startsWith('/dashboard/usuarios') || pathname.startsWith('/dashboard/usuario-empresa');
 
   return (
     <div className="h-screen flex flex-col">
-      {/* Header */}
       <header className="bg-white px-6 py-4 flex justify-between items-center shadow text-blue-800">
         <div
           className="font-bold text-xl cursor-pointer"
@@ -102,10 +112,8 @@ export default function DashboardLayout() {
         </div>
       </header>
 
-      {/* Sidebar + contenido */}
       <div className="flex flex-1 bg-gray-50">
         <aside className="w-64 bg-white shadow-lg p-4 space-y-2">
-          {/* Empresas */}
           <div>
             <button
               onClick={toggleEmpresas}
@@ -124,17 +132,20 @@ export default function DashboardLayout() {
                     setVistaActiva('registrarEmpresa');
                     setSubMenuUsuarios(false);
                   }}
-                  className={`block w-full text-left px-2 py-1 rounded ${vistaActiva === 'registrarEmpresa' ? 'bg-blue-100 font-semibold' : 'hover:bg-blue-50'}`}
+                  className={`block w-full text-left px-2 py-1 rounded ${
+                    vistaActiva === 'registrarEmpresa' ? 'bg-blue-100 font-semibold' : 'hover:bg-blue-50'
+                  }`}
                 >
                   Registrar Empresa
                 </button>
-
                 <button
                   onClick={() => {
                     setVistaActiva('listarEmpresas');
                     setSubMenuUsuarios(false);
                   }}
-                  className={`block w-full text-left px-2 py-1 rounded ${vistaActiva === 'listarEmpresas' ? 'bg-blue-100 font-semibold' : 'hover:bg-blue-50'}`}
+                  className={`block w-full text-left px-2 py-1 rounded ${
+                    vistaActiva === 'listarEmpresas' ? 'bg-blue-100 font-semibold' : 'hover:bg-blue-50'
+                  }`}
                 >
                   Consultar Empresas
                 </button>
@@ -142,7 +153,6 @@ export default function DashboardLayout() {
             )}
           </div>
 
-          {/* Usuarios */}
           <div>
             <button
               onClick={toggleUsuarios}
@@ -158,13 +168,19 @@ export default function DashboardLayout() {
               <div className="ml-6 mt-1 space-y-1 text-sm text-blue-700">
                 <button
                   onClick={() => router.push('/dashboard/usuario-empresa/registrar-usuario-empresa')}
-                  className={`block w-full text-left px-2 py-1 rounded ${pathname === '/dashboard/usuario-empresa/registrar-usuario-empresa' ? 'bg-blue-100 font-semibold' : 'hover:bg-blue-50'}`}
+                  className={`block w-full text-left px-2 py-1 rounded ${
+                    pathname === '/dashboard/usuario-empresa/registrar-usuario-empresa'
+                      ? 'bg-blue-100 font-semibold'
+                      : 'hover:bg-blue-50'
+                  }`}
                 >
                   Registrar Usuario
                 </button>
                 <button
                   onClick={() => router.push('/dashboard/usuario-empresa')}
-                  className={`block w-full text-left px-2 py-1 rounded ${pathname === '/dashboard/usuario-empresa' ? 'bg-blue-100 font-semibold' : 'hover:bg-blue-50'}`}
+                  className={`block w-full text-left px-2 py-1 rounded ${
+                    pathname === '/dashboard/usuario-empresa' ? 'bg-blue-100 font-semibold' : 'hover:bg-blue-50'
+                  }`}
                 >
                   Consultar Usuarios
                 </button>
@@ -175,7 +191,7 @@ export default function DashboardLayout() {
 
         <main className="flex-1 overflow-y-auto p-4">
           {mostrarRutasUsuarios ? (
-            <></>
+            children
           ) : (
             <>
               {vistaActiva === 'registrarEmpresa' && <RegistrarEmpresa />}
@@ -183,7 +199,9 @@ export default function DashboardLayout() {
               {vistaActiva === 'inicio' && (
                 <div className="space-y-4">
                   <h1 className="text-2xl font-bold">Dashboard General</h1>
-                  <p className="text-gray-600">Aquí irá la visualización de estadísticas, accesos rápidos y módulos.</p>
+                  <p className="text-gray-600">
+                    Aquí irá la visualización de estadísticas, accesos rápidos y módulos.
+                  </p>
                 </div>
               )}
             </>

@@ -1,9 +1,10 @@
 'use client';
 
 import { useState } from 'react';
+import type { Empresa } from '@/types';
 
 interface Props {
-  empresa: any;
+  empresa: Empresa;
   onClose: () => void;
   onUpdate: () => void;
 }
@@ -43,7 +44,9 @@ export default function EditarEmpresaModal({ empresa, onClose, onUpdate }: Props
       <div className="bg-white p-6 rounded shadow w-full max-w-md">
         <h3 className="text-lg font-bold mb-4 text-black">Editar Empresa</h3>
         <form onSubmit={handleSubmit} className="space-y-3">
-          {['nit', 'razonSocial', 'direccion', 'telefono'].map((field) => (
+          {(
+            ['nit', 'razonSocial', 'direccion', 'telefono'] as (keyof Empresa)[]
+          ).map((field) => (
             <div key={field}>
               <label className="block text-sm text-gray-800 capitalize">{field}</label>
               <input

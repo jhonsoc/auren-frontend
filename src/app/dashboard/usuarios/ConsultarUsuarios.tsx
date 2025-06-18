@@ -30,8 +30,8 @@ export default function ConsultarUsuarios() {
       const data = await res.json();
       const lista = Array.isArray(data)
         ? data
-        : Array.isArray((data as any).usuarios)
-        ? (data as any).usuarios
+        : Array.isArray((data as { usuarios?: unknown }).usuarios)
+        ? (data as { usuarios: Usuario[] }).usuarios
         : [];
       setUsuarios(lista);
     } catch {

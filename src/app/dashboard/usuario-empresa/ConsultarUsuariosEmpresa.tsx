@@ -1,27 +1,39 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { Pencil, Trash2 } from 'lucide-react';
 import ModalEditarUsuarioEmpresa from '../../components/ModalEditarUsuarioEmpresa';
 import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from '@/components/ui/select';
+import type { Usuario, Empresa } from '@/types';
 
 export default function ConsultarUsuariosEmpresa() {
-  const [usuarios, setUsuarios] = useState<any[]>([]);
-  const [empresas, setEmpresas] = useState<any[]>([]);
+  const [usuarios, setUsuarios] = useState<Usuario[]>([]);
+  const [empresas, setEmpresas] = useState<Empresa[]>([]);
   const [empresaSeleccionada, setEmpresaSeleccionada] = useState<string>('');
   const [filtro, setFiltro] = useState('');
-  const [usuarioEditando, setUsuarioEditando] = useState<any | null>(null);
+  const [usuarioEditando, setUsuarioEditando] = useState<Usuario | null>(null);
 
   useEffect(() => {
     fetchEmpresas();
   }, []);
 
+  const fetchUsuarios = useCallback(async () => {
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/usuario-empresa/empresa/${empresaSeleccionada}`, {
+        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+      });
+      const data = await res.json();
+      setUsuarios(data);
+    } catch {
+      toast.error('Error al cargar usuarios');
+    }
+  }, [empresaSeleccionada]);
   useEffect(() => {
     if (empresaSeleccionada) fetchUsuarios();
-  }, [empresaSeleccionada]);
+  }, [empresaSeleccionada, fetchUsuarios]);
 
   const fetchEmpresas = async () => {
     try {
@@ -35,17 +47,6 @@ export default function ConsultarUsuariosEmpresa() {
     }
   };
 
-  const fetchUsuarios = async () => {
-    try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/usuario-empresa/empresa/${empresaSeleccionada}`, {
-        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
-      });
-      const data = await res.json();
-      setUsuarios(data);
-    } catch {
-      toast.error('Error al cargar usuarios');
-    }
-  };
 
   const eliminarUsuario = async (id: string) => {
     if (!confirm('¿Eliminar este usuario?')) return;
@@ -78,7 +79,7 @@ export default function ConsultarUsuariosEmpresa() {
             <SelectValue placeholder="Seleccionar empresa" />
           </SelectTrigger>
           <SelectContent>
-            {empresas.map((e: any) => (
+            {empresas.map((e) => (
               <SelectItem key={e.id} value={e.id}>
                 {e.razonSocial}
               </SelectItem>
@@ -118,7 +119,11 @@ export default function ConsultarUsuariosEmpresa() {
                   <Button variant="outline" size="sm" onClick={() => setUsuarioEditando(u)}>
                     <Pencil className="w-4 h-4" />
                   </Button>
-                  <Button variant="destructive" size="sm" onClick={() => eliminarUsuario(u.id)}>
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    onClick={() => u.id && eliminarUsuario(u.id)}
+                  >
                     <Trash2 className="w-4 h-4" />
                   </Button>
                 </td>

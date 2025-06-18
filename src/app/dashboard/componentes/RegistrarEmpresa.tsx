@@ -21,7 +21,6 @@ export default function RegistrarEmpresa() {
     e.preventDefault();
     setLoading(true);
     const token = localStorage.getItem('token');
-    console.log(token)
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/empresas`, {
         method: 'POST',
