@@ -1,38 +1,47 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import type { Usuario } from '@/types';
+import { useEffect, useState, useCallback } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { Pencil, Trash2 } from 'lucide-react';
 import ModalEditarUsuario from '@/components/usuarios/ModalEditarUsuario';
 
+interface Usuario {
+  id: string;
+  documento: string;
+  nombres: string;
+  apellidos: string;
+  telefono: string;
+  email: string;
+  rol: string;
+}
+
 export default function ConsultarUsuarios() {
   const [usuarios, setUsuarios] = useState<Usuario[]>([]);
   const [filtro, setFiltro] = useState('');
   const [usuarioEditando, setUsuarioEditando] = useState<Usuario | null>(null);
 
-  useEffect(() => {
-    fetchUsuarios();
-  }, []);
-
-  const fetchUsuarios = async () => {
+  const fetchUsuarios = useCallback(async () => {
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/usuarios`, {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
       });
       const data = await res.json();
       const lista = Array.isArray(data)
-        ? (data as Usuario[])
+        ? data
         : Array.isArray((data as { usuarios?: unknown }).usuarios)
-        ? ((data as { usuarios: Usuario[] }).usuarios)
+        ? (data as { usuarios: Usuario[] }).usuarios
         : [];
       setUsuarios(lista);
     } catch {
       toast.error('Error al cargar usuarios');
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    fetchUsuarios();
+  }, [fetchUsuarios]);
 
   const eliminarUsuario = async (id: string) => {
     if (!confirm('¿Eliminar este usuario?')) return;
@@ -92,11 +101,7 @@ export default function ConsultarUsuarios() {
                   <Button variant="outline" size="sm" onClick={() => setUsuarioEditando(u)}>
                     <Pencil className="w-4 h-4" />
                   </Button>
-                  <Button
-                    variant="destructive"
-                    size="sm"
-                    onClick={() => u.id && eliminarUsuario(u.id)}
-                  >
+                  <Button variant="destructive" size="sm" onClick={() => eliminarUsuario(u.id)}>
                     <Trash2 className="w-4 h-4" />
                   </Button>
                 </td>
