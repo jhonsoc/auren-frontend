@@ -54,6 +54,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         router.push('/login');
     };
 
+    const mostrarRutasUsuarios = pathname.startsWith('/dashboard/usuarios') || pathname.startsWith('/dashboard/usuario-empresa');
+
     return (
         <div className="h-screen flex flex-col">
             {/* Header */}
@@ -156,7 +158,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 </aside>
 
                 <main className="flex-1 overflow-y-auto p-4">
-                    {children ?? (
+                    {mostrarRutasUsuarios ? (
+                        children
+                    ) : (
                         <>
                             {vistaActiva === 'registrarEmpresa' && <RegistrarEmpresa />}
                             {vistaActiva === 'listarEmpresas' && <ListaEmpresas />}
