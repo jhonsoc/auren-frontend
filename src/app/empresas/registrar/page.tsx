@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import type { Empresa } from '@/types';
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
 import { useAuthGuard } from '@/hooks/useAuthGuard';
@@ -9,7 +10,7 @@ export default function RegistrarEmpresaPage() {
   useAuthGuard();
   const router = useRouter();
 
-  const [form, setForm] = useState({
+  const [form, setForm] = useState<Omit<Empresa, 'id'>>({
     nombre: '',
     nit: '',
     email: '',
@@ -78,7 +79,7 @@ export default function RegistrarEmpresaPage() {
             </label>
             <input
               name={campo}
-              value={(form as any)[campo]}
+              value={form[campo as keyof typeof form]}
               onChange={handleChange}
               type={campo === 'email' ? 'email' : 'text'}
               className="w-full border border-gray-300 px-3 py-2 rounded focus:outline-none focus:ring-1 focus:ring-blue-600"

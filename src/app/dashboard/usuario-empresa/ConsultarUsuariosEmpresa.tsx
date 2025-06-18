@@ -1,19 +1,20 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { Pencil, Trash2 } from 'lucide-react';
 import ModalEditarUsuarioEmpresa from '../../components/ModalEditarUsuarioEmpresa';
 import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from '@/components/ui/select';
+import type { Usuario, Empresa } from '@/types';
 
 export default function ConsultarUsuariosEmpresa() {
-  const [usuarios, setUsuarios] = useState<any[]>([]);
-  const [empresas, setEmpresas] = useState<any[]>([]);
+  const [usuarios, setUsuarios] = useState<Usuario[]>([]);
+  const [empresas, setEmpresas] = useState<Empresa[]>([]);
   const [empresaSeleccionada, setEmpresaSeleccionada] = useState<string>('');
   const [filtro, setFiltro] = useState('');
-  const [usuarioEditando, setUsuarioEditando] = useState<any | null>(null);
+  const [usuarioEditando, setUsuarioEditando] = useState<Usuario | null>(null);
 
   useEffect(() => {
     fetchEmpresas();
@@ -21,7 +22,7 @@ export default function ConsultarUsuariosEmpresa() {
 
   useEffect(() => {
     if (empresaSeleccionada) fetchUsuarios();
-  }, [empresaSeleccionada]);
+  }, [empresaSeleccionada, fetchUsuarios]);
 
   const fetchEmpresas = async () => {
     try {
@@ -35,7 +36,7 @@ export default function ConsultarUsuariosEmpresa() {
     }
   };
 
-  const fetchUsuarios = async () => {
+  const fetchUsuarios = useCallback(async () => {
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/usuario-empresa/empresa/${empresaSeleccionada}`, {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
@@ -45,7 +46,7 @@ export default function ConsultarUsuariosEmpresa() {
     } catch {
       toast.error('Error al cargar usuarios');
     }
-  };
+  }, [empresaSeleccionada]);
 
   const eliminarUsuario = async (id: string) => {
     if (!confirm('¿Eliminar este usuario?')) return;
@@ -78,7 +79,7 @@ export default function ConsultarUsuariosEmpresa() {
             <SelectValue placeholder="Seleccionar empresa" />
           </SelectTrigger>
           <SelectContent>
-            {empresas.map((e: any) => (
+            {empresas.map((e) => (
               <SelectItem key={e.id} value={e.id}>
                 {e.razonSocial}
               </SelectItem>
